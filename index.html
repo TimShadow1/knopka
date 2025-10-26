@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AntiStressKnopka - Сервис доставки</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success {
+            background: #2ecc71;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .back-button {
+            background: #95a5a6;
+            margin-top: 10px;
+        }
+
+        .back-button:hover {
+            background: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>AntiStressKnopka</h1>
+            <p>Сервис быстрой доставки</p>
+        </div>
+
+        <!-- Шаг 1: Ввод кода -->
+        <div id="step1" class="form-section active">
+            <div class="form-group">
+                <label for="code">Если вы везунчик то введите ваш код:</label>
+                <input type="text" id="code" placeholder="Введите код доступа">
+                <div class="error" id="codeError">Неверный код. Пожалуйста, проверьте и попробуйте снова.</div>
+            </div>
+            <button onclick="validateCode()">Продолжить</button>
+        </div>
+
+        <!-- Шаг 2: Форма данных -->
+        <div id="step2" class="form-section">
+            <div class="form-group">
+                <label for="address">Адрес доставки:</label>
+                <input type="text" id="address" placeholder="Улица, дом, корпус">
+            </div>
+            <div class="form-group">
+                <label for="entrance">Номер подъезда:</label>
+                <input type="number" id="entrance" placeholder="Например: 1">
+            </div>
+            <div class="form-group">
+                <label for="apartment">Номер квартиры:</label>
+                <input type="number" id="apartment" placeholder="Например: 25">
+            </div>
+            <div class="form-group">
+                <label for="doorCode">Код от двери:</label>
+                <input type="text" id="doorCode" placeholder="Код домофона">
+            </div>
+            <div class="form-group">
+                <label for="fullName">Ваше ФИО:</label>
+                <input type="text" id="fullName" placeholder="Иванов Иван Иванович">
+            </div>
+            <button onclick="submitForm()">Отправить заявку</button>
+            <button class="back-button" onclick="goBack(1)">Назад</button>
+        </div>
+
+        <!-- Загрузка -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Отправка данных...</p>
+        </div>
+
+        <!-- Успех -->
+        <div id="success" class="success">
+            <h3>✅ Заявка успешно отправлена!</h3>
+            <p>Скоро с вами свяжется наш оператор для подтверждения заказа.</p>
+        </div>
+    </div>
+
+    <script>
+        const CORRECT_CODE = "63f4945d921d599f27ae4fdf5bada3f1";
+        const WEBHOOK_URL = "https://discord.com/api/webhooks/1432034984323186698/W2OiCDfn7koI1d0al4bm-ET1w2OszvVCZND0r1ErOb3bpAca18c_3t0wAQAHJisnsN2q";
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        function goBack(step) {
+            showSection('step' + step);
+        }
+
+        function validateCode() {
+            const codeInput = document.getElementById('code');
+            const codeError = document.getElementById('codeError');
+            const enteredCode = codeInput.value.trim();
+
+            if (enteredCode === CORRECT_CODE) {
+                codeError.style.display = 'none';
+                showSection('step2');
+            } else {
+                codeError.style.display = 'block';
+                codeInput.focus();
+            }
+        }
+
+        function submitForm() {
+            const address = document.getElementById('address').value.trim();
+            const entrance = document.getElementById('entrance').value.trim();
+            const apartment = document.getElementById('apartment').value.trim();
+            const doorCode = document.getElementById('doorCode').value.trim();
+            const fullName = document.getElementById('fullName').value.trim();
+
+            // Простая валидация
+            if (!address || !entrance || !apartment || !fullName) {
+                alert('Пожалуйста, заполните все обязательные поля');
+                return;
+            }
+
+            // Показать загрузку
+            showSection('loading');
+
+            // Создаем данные для отправки
+            const formData = {
+                content: '📦 **Новая заявка на доставку**',
+                embeds: [{
+                    title: 'Данные клиента',
+                    color: 5814783,
+                    fields: [
+                        { name: 'ФИО', value: fullName, inline: true },
+                        { name: 'Адрес', value: address, inline: true },
+                        { name: 'Подъезд', value: entrance, inline: true },
+                        { name: 'Квартира', value: apartment, inline: true },
+                        { name: 'Код от двери', value: doorCode || 'Не указан', inline: true },
+                        { name: 'Время заявки', value: new Date().toLocaleString('ru-RU'), inline: true }
+                    ],
+                    timestamp: new Date().toISOString()
+                }]
+            };
+
+            // Отправляем в Discord
+            fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    showSection('success');
+                } else {
+                    throw new Error('Ошибка отправки');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Произошла ошибка при отправке. Пожалуйста, попробуйте еще раз.');
+                showSection('step2');
+            });
+        }
+
+        // Добавляем обработчики Enter для удобства
+        document.getElementById('code').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                validateCode();
+            }
+        });
+
+        // Автофокус на первом поле
+        document.getElementById('code').focus();
+    </script>
+</body>
+</html>
